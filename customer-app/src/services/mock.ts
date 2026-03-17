@@ -1,11 +1,15 @@
-import type { AxiosInstance } from 'axios';
+import type { AxiosInstance, InternalAxiosRequestConfig } from 'axios';
 import type { Category, Menu, Order, GameQuestion } from '../types';
+import { broadcastToRoom } from './broadcast';
+
+const IMG = 'https://raw.githubusercontent.com/shinequasar/aws-the-mingle/main/backend/uploads';
 
 const categories: Category[] = [
   { id: 1, name: '분식', storeId: 1 },
   { id: 2, name: '면류', storeId: 1 },
   { id: 3, name: '사이드', storeId: 1 },
   { id: 4, name: '디저트', storeId: 1 },
+  { id: 5, name: '주류', storeId: 1 },
 ];
 
 const menus: Menu[] = [
@@ -23,6 +27,13 @@ const menus: Menu[] = [
   { id: 12, categoryId: 4, name: '말차 초코빵', price: 3500, description: '진한 말차 크림이 가득한 초코빵', imageUrl: '', displayOrder: 1, storeId: 1 },
   { id: 13, categoryId: 4, name: '딸기 토스트', price: 5500, description: '생크림과 딸기잼의 달콤한 토스트', imageUrl: '', displayOrder: 2, storeId: 1 },
   { id: 14, categoryId: 4, name: '탕후루', price: 4000, description: '달콤 바삭한 과일 탕후루', imageUrl: '', displayOrder: 3, storeId: 1 },
+  { id: 15, categoryId: 5, name: '새로', price: 5000, description: '제로슈거 깔끔한 소주 360ml', imageUrl: `${IMG}/soju_saero.jpg`, displayOrder: 1, storeId: 1 },
+  { id: 16, categoryId: 5, name: '가로', price: 5000, description: '새로를 가로로! 눕혀서 마시면 더 맛있다?', imageUrl: `${IMG}/soju_garo.jpg`, displayOrder: 2, storeId: 1 },
+  { id: 17, categoryId: 5, name: '거꾸로', price: 5000, description: '새로를 거꾸로! 뒤집어진 소주 🙃', imageUrl: `${IMG}/soju_geokuro.jpg`, displayOrder: 3, storeId: 1 },
+  { id: 18, categoryId: 5, name: '생맥주', price: 5000, description: '시원한 생맥주 500ml', imageUrl: `${IMG}/beer_glass.jpg`, displayOrder: 4, storeId: 1 },
+  { id: 19, categoryId: 5, name: '하이볼', price: 7000, description: '위스키 소다 하이볼', imageUrl: `${IMG}/highball.jpg`, displayOrder: 5, storeId: 1 },
+  { id: 20, categoryId: 5, name: '와인', price: 15000, description: '하우스 레드/화이트 와인 한 잔', imageUrl: `${IMG}/wine_glass.jpg`, displayOrder: 6, storeId: 1 },
+  { id: 21, categoryId: 5, name: '막걸리', price: 8000, description: '전통 생막걸리 한 병', imageUrl: `${IMG}/makgeolli.jpg`, displayOrder: 7, storeId: 1 },
 ];
 
 const mockOrders: Order[] = [
@@ -56,39 +67,54 @@ function pick<T>(arr: T[]): T { return arr[Math.floor(Math.random() * arr.length
 
 let orderIdSeq = 100;
 
-const ok = <T,>(data: T) => Promise.resolve({ data: { success: true, message: 'ok', data } });
+const ok = <T,>(data: T) => ({ success: true, message: 'ok', data });
 
-type RouteHandler = (params: Record<string, string>, body?: unknown) => Promise<unknown>;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type RouteHandler = (params: Record<string, string>, body?: any, query?: Record<string, string>) => any;
 
 const routes: [string, string, RouteHandler][] = [
   ['POST', '/auth/room/login', () => ok({ token: 'mock-token', storeId: 1, roomId: 1, storeName: '헌팅포차 강남점 (Mock)' })],
   ['GET', '/stores/:storeId/categories', () => ok(categories)],
-  ['GET', '/stores/:storeId/menus', (_p, _b, query?: Record<string, string>) => {
+  ['GET', '/stores/:storeId/menus', (_p, _b, query) => {
     const catId = query?.categoryId ? Number(query.categoryId) : null;
     return ok(catId ? menus.filter(m => m.categoryId === catId) : menus);
   }],
   ['GET', '/rooms/:roomId/orders', () => ok(mockOrders)],
-  ['POST', '/rooms/:roomId/orders', (_p, body: unknown) => {
-    const b = body as { totalAmount: number; items: { menuName: string; quantity: number; unitPrice: number }[] };
+  ['POST', '/rooms/:roomId/orders', (_p, body) => {
     const id = ++orderIdSeq;
-    return ok({ id, orderNumber: `ORD-${id}`, totalAmount: b.totalAmount, status: 'PENDING' });
+    return ok({ id, orderNumber: `ORD-${id}`, totalAmount: body?.totalAmount ?? 0, status: 'PENDING' });
   }],
   ['GET', '/rooms/:roomId/time', () => ok({ roomId: 1, expiresAt: new Date(Date.now() + 3 * 3600000).toISOString(), remainingMinutes: 180 })],
   ['POST', '/rooms/:roomId/calls', () => ok({ id: 1 })],
-  ['POST', '/rooms/:roomId/messages', () => ok({ id: 1 })],
-  ['POST', '/rooms/:roomId/photos', () => ok({ id: 1 })],
-  ['POST', '/rooms/:roomId/merge-request', () => ok({ id: 1, status: 'PENDING' })],
+  ['POST', '/rooms/:roomId/messages', (params, body) => {
+    const senderRoomId = Number(params.roomId);
+    const targetRoomId = body?.targetRoomId;
+    if (targetRoomId) broadcastToRoom(targetRoomId, { type: 'MESSAGE_RECEIVED', senderRoomId, content: body?.content ?? '' });
+    return ok({ id: 1 });
+  }],
+  ['POST', '/rooms/:roomId/photos', (params, body) => {
+    const senderRoomId = Number(params.roomId);
+    const targetRoomId = Number(body?.targetRoomId ?? body?.get?.('targetRoomId'));
+    if (targetRoomId) broadcastToRoom(targetRoomId, { type: 'PHOTO_RECEIVED', senderRoomId });
+    return ok({ id: 1 });
+  }],
+  ['POST', '/rooms/:roomId/merge-request', (params, body) => {
+    const requesterRoomId = Number(params.roomId);
+    const targetRoomId = body?.targetRoomId;
+    if (targetRoomId) broadcastToRoom(targetRoomId, { type: 'MERGE_REQUEST', requesterRoomId, requestId: 1 });
+    return ok({ id: 1, status: 'PENDING' });
+  }],
   ['PUT', '/rooms/:roomId/merge-request/:requestId/respond', () => ok({ status: 'ACCEPTED' })],
   ['PUT', '/rooms/:roomId/send-menu/:requestId/respond', () => ok({ status: 'ACCEPTED' })],
   ['GET', '/games/icebreaker', () => ok(pick(icebreakers))],
   ['GET', '/games/balance', () => ok(pick(balanceQs))],
   ['GET', '/games/truth-or-lie', () => ok(pick(truthOrLie))],
   ['GET', '/games/topic', () => ok(pick(topics))],
-  ['GET', '/games/roulette', (_p, _b, query?: Record<string, string>) => {
+  ['GET', '/games/roulette', (_p, _b, query) => {
     const count = Number(query?.playerCount ?? 4);
     return ok({ selectedPlayer: Math.ceil(Math.random() * count), penalty: pick(penalties) });
   }],
-  ['GET', '/games/ladder', (_p, _b, query?: Record<string, string>) => {
+  ['GET', '/games/ladder', (_p, _b, query) => {
     const count = Number(query?.playerCount ?? 4);
     const results: Record<string, string> = {};
     for (let i = 1; i <= count; i++) results[String(i)] = pick(penalties);
@@ -124,20 +150,25 @@ function parseQuery(url: string): Record<string, string> {
 export function enableMock(instance: AxiosInstance) {
   console.log('%c[MOCK MODE] 백엔드 없이 mock 데이터로 동작합니다', 'color: orange; font-weight: bold;');
 
-  instance.interceptors.request.use(async (config) => {
+  // adapter를 교체해서 네트워크 요청 자체를 가로챔
+  const originalAdapter = instance.defaults.adapter;
+  instance.defaults.adapter = (config: InternalAxiosRequestConfig) => {
     const url = config.url ?? '';
     const method = (config.method ?? 'GET').toUpperCase();
     const matched = matchRoute(method, url);
+
     if (matched) {
       const query = parseQuery(url);
-      const result = await (matched.handler as (p: Record<string, string>, b: unknown, q: Record<string, string>) => Promise<unknown>)(matched.params, config.data, query);
-      return Promise.reject({ __mock: true, response: { status: 200, data: (result as { data: unknown }).data, headers: {}, config } });
+      let body = config.data;
+      if (typeof body === 'string') { try { body = JSON.parse(body); } catch { /* keep as-is */ } }
+      const data = matched.handler(matched.params, body, query);
+      return Promise.resolve({ data, status: 200, statusText: 'OK', headers: {}, config });
     }
-    return config;
-  });
 
-  instance.interceptors.response.use(undefined, (error) => {
-    if (error?.__mock) return Promise.resolve(error.response);
-    return Promise.reject(error);
-  });
+    // 매칭 안 되는 요청은 원래 adapter로 (또는 빈 성공 응답)
+    if (originalAdapter && typeof originalAdapter === 'function') {
+      return originalAdapter(config);
+    }
+    return Promise.resolve({ data: { success: true, data: null }, status: 200, statusText: 'OK', headers: {}, config });
+  };
 }
