@@ -28,17 +28,17 @@ export default function NotificationToast() {
     if (latest.type === 'SEND_MENU_REQUEST' || latest.type === 'MERGE_REQUEST') {
       toast((t) => (
         <div className="space-y-2">
-          <p className="font-bold">{config && config.icon} {label}</p>
-          <p className="text-sm text-gray-500">Room {String(latest.requesterRoomId ?? latest.senderRoomId)}에서</p>
+          <p className="font-bold text-ink">{config && config.icon} {label}</p>
+          <p className="text-sm text-gray-400">Room {String(latest.requesterRoomId ?? latest.senderRoomId)}에서</p>
           <div className="flex gap-2">
-            <button className="px-3 py-1 bg-blue-600 text-white rounded-lg text-sm" onClick={() => {
+            <button className="px-3 py-1 bg-pink-500 text-white rounded-lg text-sm font-medium" onClick={() => {
               const endpoint = latest.type === 'MERGE_REQUEST'
                 ? `/rooms/${roomId}/merge-request/${latest.requestId}/respond`
                 : `/rooms/${roomId}/send-menu/${latest.requestId}/respond`;
               api.put(endpoint, { accept: true }).then(() => toast.success('수락!')).catch(() => toast.error('실패'));
               toast.dismiss(t.id);
             }}>수락</button>
-            <button className="px-3 py-1 bg-gray-200 rounded-lg text-sm" onClick={() => {
+            <button className="px-3 py-1 bg-gray-200 text-ink rounded-lg text-sm font-medium" onClick={() => {
               const endpoint = latest.type === 'MERGE_REQUEST'
                 ? `/rooms/${roomId}/merge-request/${latest.requestId}/respond`
                 : `/rooms/${roomId}/send-menu/${latest.requestId}/respond`;

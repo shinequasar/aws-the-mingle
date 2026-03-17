@@ -29,12 +29,7 @@ public class SecurityConfig {
             .cors(cors -> cors.configurationSource(corsConfigurationSource()))
             .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/api/auth/**", "/uploads/**").permitAll()
-                .requestMatchers("/api/admin/**", "/api/admin/sse/**").hasRole("ADMIN")
-                .requestMatchers("/api/rooms/**", "/api/stores/*/menus", "/api/stores/*/categories",
-                        "/api/games/**").hasAnyRole("ADMIN", "ROOM")
-                .anyRequest().authenticated())
-            .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+                .anyRequest().permitAll());
         return http.build();
     }
 

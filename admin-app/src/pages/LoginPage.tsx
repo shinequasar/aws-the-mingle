@@ -33,7 +33,13 @@ export default function LoginPage() {
         <button data-testid="admin-login-submit" type="submit" disabled={loading} className="w-full p-3 bg-blue-600 text-white rounded-lg font-bold disabled:opacity-50">
           {loading ? '로그인 중...' : '로그인'}
         </button>
-        <button type="button" onClick={() => { login('bypass-token', 1, '테스트매장'); navigate('/', { replace: true }); }} className="w-full p-2 text-sm text-gray-400 underline">
+        <button type="button" onClick={async () => {
+          try {
+            const { data } = await api.post('/auth/admin/login', { storeCode: 'HP01', username: 'admin', password: 'admin123' });
+            login(data.data.token, data.data.storeId, data.data.storeName);
+          } catch { login('bypass-token', 1, '테스트매장'); }
+          navigate('/', { replace: true });
+        }} className="w-full p-2 text-sm text-gray-400 underline">
           테스트 로그인 (바이패스)
         </button>
       </form>

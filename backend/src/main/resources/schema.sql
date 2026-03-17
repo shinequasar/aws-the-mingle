@@ -227,3 +227,79 @@ INSERT INTO game_questions (type, content) VALUES
 ('PENALTY', '30초 동안 개인기 보여주기'),
 ('PENALTY', '가장 최근 찍은 셀카 공개'),
 ('PENALTY', '옆 사람과 하이파이브 10번');
+
+-- Seed: store
+INSERT INTO stores (store_code, name, address, phone, created_at, updated_at)
+VALUES ('HP01', '헌팅포차 강남점', '서울시 강남구', '02-1234-5678', NOW(), NOW());
+
+-- Seed: admin (password: admin123)
+INSERT INTO admins (store_id, username, password, login_attempts, created_at)
+VALUES (1, 'admin', '$2b$12$UjYcv7B8QaLVFOFTXulzkeU2WrljMa/IqsLp48LtbeKXFMmnqLwF2', 0, NOW());
+
+-- Seed: rooms (password: 1234)
+INSERT INTO rooms (store_id, room_number, password, created_at) VALUES
+(1, 1, '$2b$12$/0qBmk5ReQ1sRUZaFdIuqOGrfI3d7GYUtzVXiTZ6knh98kI83g/hq', NOW()),
+(1, 2, '$2b$12$/0qBmk5ReQ1sRUZaFdIuqOGrfI3d7GYUtzVXiTZ6knh98kI83g/hq', NOW()),
+(1, 3, '$2b$12$/0qBmk5ReQ1sRUZaFdIuqOGrfI3d7GYUtzVXiTZ6knh98kI83g/hq', NOW()),
+(1, 4, '$2b$12$/0qBmk5ReQ1sRUZaFdIuqOGrfI3d7GYUtzVXiTZ6knh98kI83g/hq', NOW()),
+(1, 5, '$2b$12$/0qBmk5ReQ1sRUZaFdIuqOGrfI3d7GYUtzVXiTZ6knh98kI83g/hq', NOW()),
+(1, 6, '$2b$12$/0qBmk5ReQ1sRUZaFdIuqOGrfI3d7GYUtzVXiTZ6knh98kI83g/hq', NOW());
+
+-- Seed: room sessions
+INSERT INTO room_sessions (room_id, started_at, expires_at, active) VALUES
+(1, NOW(), DATE_ADD(NOW(), INTERVAL 4 HOUR), TRUE),
+(2, NOW(), DATE_ADD(NOW(), INTERVAL 4 HOUR), TRUE),
+(3, NOW(), DATE_ADD(NOW(), INTERVAL 4 HOUR), TRUE),
+(4, NOW(), DATE_ADD(NOW(), INTERVAL 4 HOUR), TRUE),
+(5, NOW(), DATE_ADD(NOW(), INTERVAL 4 HOUR), TRUE),
+(6, NOW(), DATE_ADD(NOW(), INTERVAL 4 HOUR), TRUE);
+
+-- Seed: categories
+INSERT INTO categories (store_id, name, display_order) VALUES
+(1, '주류', 0),
+(1, '분식', 1),
+(1, '면류', 2),
+(1, '사이드', 3),
+(1, '디저트', 4);
+
+-- Seed: menus - 주류
+INSERT INTO menus (category_id, name, price, description, image_url, display_order, available, created_at, updated_at) VALUES
+((SELECT id FROM categories WHERE name='주류'), '가로', 5000, '가로 소주', '/uploads/soju-garo.png', 1, TRUE, NOW(), NOW()),
+((SELECT id FROM categories WHERE name='주류'), '새로', 5000, '새로 소주', '/uploads/soju-saero.png', 2, TRUE, NOW(), NOW()),
+((SELECT id FROM categories WHERE name='주류'), '거꾸로', 5000, '거꾸로 소주', '/uploads/soju-gekkuro.png', 3, TRUE, NOW(), NOW()),
+((SELECT id FROM categories WHERE name='주류'), '카스 생맥주 500ml', 5000, '시원한 생맥주', 'https://images.unsplash.com/photo-1608270586620-248524c67de9?w=400&h=400&fit=crop', 4, TRUE, NOW(), NOW()),
+((SELECT id FROM categories WHERE name='주류'), '테라 생맥주 500ml', 5000, '청정라거 테라', 'https://images.unsplash.com/photo-1535958636474-b021ee887b13?w=400&h=400&fit=crop', 5, TRUE, NOW(), NOW()),
+((SELECT id FROM categories WHERE name='주류'), '켈리 생맥주 500ml', 5000, '켈리 생맥주', 'https://images.unsplash.com/photo-1567696911980-2eed69a46042?w=400&h=400&fit=crop', 6, TRUE, NOW(), NOW()),
+((SELECT id FROM categories WHERE name='주류'), '소주 (참이슬)', 5000, '참이슬 후레쉬 360ml', 'https://images.unsplash.com/photo-1514362545857-3bc16c4c7d1b?w=400&h=400&fit=crop', 7, TRUE, NOW(), NOW()),
+((SELECT id FROM categories WHERE name='주류'), '소주 (처음처럼)', 5000, '처음처럼 360ml', 'https://images.unsplash.com/photo-1551024709-8f23befc6f87?w=400&h=400&fit=crop', 8, TRUE, NOW(), NOW()),
+((SELECT id FROM categories WHERE name='주류'), '맥주 (카스)', 5000, '카스 프레시 355ml', 'https://images.unsplash.com/photo-1618885472179-5e474019f2a9?w=400&h=400&fit=crop', 9, TRUE, NOW(), NOW()),
+((SELECT id FROM categories WHERE name='주류'), '맥주 (테라)', 5000, '테라 355ml', 'https://images.unsplash.com/photo-1571613316887-6f8d5cbf7ef7?w=400&h=400&fit=crop', 10, TRUE, NOW(), NOW()),
+((SELECT id FROM categories WHERE name='주류'), '하이볼', 8000, '위스키 하이볼', 'https://images.unsplash.com/photo-1560512823-829485b8bf24?w=400&h=400&fit=crop', 11, TRUE, NOW(), NOW()),
+((SELECT id FROM categories WHERE name='주류'), '과일소주 (청포도)', 7000, '청포도에이슬', 'https://images.unsplash.com/photo-1536935338788-846bb9981813?w=400&h=400&fit=crop', 12, TRUE, NOW(), NOW()),
+((SELECT id FROM categories WHERE name='주류'), '칵테일 (모히또)', 9000, '상큼한 모히또', 'https://images.unsplash.com/photo-1551538827-9c037cb4f32a?w=400&h=400&fit=crop', 13, TRUE, NOW(), NOW());
+
+-- Seed: menus - 분식
+INSERT INTO menus (category_id, name, price, description, display_order, available, created_at, updated_at) VALUES
+((SELECT id FROM categories WHERE name='분식'), '핫도그 세트', 5000, NULL, 1, TRUE, NOW(), NOW()),
+((SELECT id FROM categories WHERE name='분식'), '떡꼬치', 4000, NULL, 2, TRUE, NOW(), NOW()),
+((SELECT id FROM categories WHERE name='분식'), '소고기 김밥', 4500, NULL, 3, TRUE, NOW(), NOW());
+
+-- Seed: menus - 면류
+INSERT INTO menus (category_id, name, price, description, display_order, available, created_at, updated_at) VALUES
+((SELECT id FROM categories WHERE name='면류'), '만두 라면', 7000, NULL, 1, TRUE, NOW(), NOW()),
+((SELECT id FROM categories WHERE name='면류'), '토마토 파스타', 8500, NULL, 2, TRUE, NOW(), NOW()),
+((SELECT id FROM categories WHERE name='면류'), '비빔면', 6000, NULL, 3, TRUE, NOW(), NOW());
+
+-- Seed: menus - 사이드
+INSERT INTO menus (category_id, name, price, description, display_order, available, created_at, updated_at) VALUES
+((SELECT id FROM categories WHERE name='사이드'), '군만두', 5500, NULL, 1, TRUE, NOW(), NOW()),
+((SELECT id FROM categories WHERE name='사이드'), '새우튀김', 7500, NULL, 2, TRUE, NOW(), NOW()),
+((SELECT id FROM categories WHERE name='사이드'), '감자구이', 5000, NULL, 3, TRUE, NOW(), NOW()),
+((SELECT id FROM categories WHERE name='사이드'), '브로콜리 소시지', 4500, NULL, 4, TRUE, NOW(), NOW()),
+((SELECT id FROM categories WHERE name='사이드'), '잉글리시 브렉퍼스트', 9000, NULL, 5, TRUE, NOW(), NOW());
+
+-- Seed: menus - 디저트
+INSERT INTO menus (category_id, name, price, description, display_order, available, created_at, updated_at) VALUES
+((SELECT id FROM categories WHERE name='디저트'), '말차 초코빵', 3500, NULL, 1, TRUE, NOW(), NOW()),
+((SELECT id FROM categories WHERE name='디저트'), '딸기 토스트', 5500, NULL, 2, TRUE, NOW(), NOW()),
+((SELECT id FROM categories WHERE name='디저트'), '탕후루', 4000, NULL, 3, TRUE, NOW(), NOW());

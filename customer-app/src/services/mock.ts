@@ -72,8 +72,20 @@ const ok = <T,>(data: T) => ({ success: true, message: 'ok', data });
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type RouteHandler = (params: Record<string, string>, body?: any, query?: Record<string, string>) => any;
 
+const mockRooms = [
+  { id: 1, roomNumber: 1, storeId: 1, active: true, label: '💑' },
+  { id: 2, roomNumber: 2, storeId: 1, active: true, label: '👫' },
+  { id: 3, roomNumber: 3, storeId: 1, active: false, label: '' },
+  { id: 4, roomNumber: 4, storeId: 1, active: true, label: '🥳' },
+  { id: 5, roomNumber: 5, storeId: 1, active: true, label: '🎉' },
+  { id: 6, roomNumber: 6, storeId: 1, active: false, label: '' },
+  { id: 7, roomNumber: 7, storeId: 1, active: true, label: '🍻' },
+  { id: 8, roomNumber: 8, storeId: 1, active: true, label: '💃' },
+];
+
 const routes: [string, string, RouteHandler][] = [
   ['POST', '/auth/room/login', () => ok({ token: 'mock-token', storeId: 1, roomId: 1, storeName: '헌팅포차 강남점 (Mock)' })],
+  ['GET', '/stores/:storeId/rooms', () => ok(mockRooms)],
   ['GET', '/stores/:storeId/categories', () => ok(categories)],
   ['GET', '/stores/:storeId/menus', (_p, _b, query) => {
     const catId = query?.categoryId ? Number(query.categoryId) : null;

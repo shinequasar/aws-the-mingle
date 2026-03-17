@@ -53,7 +53,7 @@ public class AuthService {
         adminRepository.save(admin);
 
         String token = jwtTokenProvider.generateToken(admin.getId(), store.getId(), "ADMIN");
-        return new LoginResponse(token, "ADMIN", store.getId());
+        return new LoginResponse(token, "ADMIN", store.getId(), null, store.getName());
     }
 
     public LoginResponse roomLogin(RoomLoginRequest request) {
@@ -68,6 +68,6 @@ public class AuthService {
         }
 
         String token = jwtTokenProvider.generateToken(room.getId(), store.getId(), "ROOM");
-        return new LoginResponse(token, "ROOM", store.getId());
+        return new LoginResponse(token, "ROOM", store.getId(), room.getId(), store.getName());
     }
 }

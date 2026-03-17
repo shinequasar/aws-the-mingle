@@ -14,6 +14,8 @@ public class GameQuestion {
     private String category;
     @Column(nullable = false, columnDefinition = "TEXT")
     private String content;
+    @Column(name = "option_a")
     private String optionA;
+    @Column(name = "option_b")
     private String optionB;
 }

@@ -20,7 +20,7 @@ export default function TimerWidget() {
   const warn = remaining <= 30;
 
   return (
-    <span data-testid="timer-widget" className={`text-sm font-mono font-bold ${warn ? 'text-red-500' : 'text-gray-600'}`}>
+    <span data-testid="timer-widget" className={`text-sm font-mono font-bold ${warn ? 'text-pink-500 animate-pulse' : 'text-gray-500'}`}>
       ⏱ {h}:{m.toString().padStart(2, '0')}
     </span>
   );

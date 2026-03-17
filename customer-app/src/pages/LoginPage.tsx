@@ -30,18 +30,25 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="flex items-center justify-center h-screen bg-gray-100">
-      <form onSubmit={handleSubmit} className="bg-white p-8 rounded-2xl shadow-lg w-80 space-y-4">
-        <h1 className="text-2xl font-bold text-center">🍻 룸 헌팅포차</h1>
-        <input data-testid="login-store-code" value={storeCode} onChange={(e) => setStoreCode(e.target.value)} placeholder="매장 코드" className="w-full p-3 border rounded-lg text-lg" required />
-        <input data-testid="login-room-number" value={roomNumber} onChange={(e) => setRoomNumber(e.target.value)} placeholder="룸 번호" className="w-full p-3 border rounded-lg text-lg" required />
-        <input data-testid="login-password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="비밀번호" className="w-full p-3 border rounded-lg text-lg" required />
-        <button data-testid="login-submit-button" type="submit" disabled={loading} className="w-full p-3 bg-blue-600 text-white rounded-lg text-lg font-bold disabled:opacity-50">
+    <div className="flex items-center justify-center h-screen bg-pink-50">
+      <form onSubmit={handleSubmit} className="bg-white p-8 rounded-3xl shadow-xl w-80 space-y-4">
+        <h1 className="text-2xl font-bold text-center text-ink">💕 룸 헌팅포차</h1>
+        <input data-testid="login-store-code" value={storeCode} onChange={(e) => setStoreCode(e.target.value)} placeholder="매장 코드" className="w-full p-3 border border-gray-200 rounded-xl text-lg focus:border-pink-500 focus:outline-none" required />
+        <input data-testid="login-room-number" value={roomNumber} onChange={(e) => setRoomNumber(e.target.value)} placeholder="룸 번호" className="w-full p-3 border border-gray-200 rounded-xl text-lg focus:border-pink-500 focus:outline-none" required />
+        <input data-testid="login-password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="비밀번호" className="w-full p-3 border border-gray-200 rounded-xl text-lg focus:border-pink-500 focus:outline-none" required />
+        <button data-testid="login-submit-button" type="submit" disabled={loading} className="w-full p-3 bg-ink text-white rounded-xl text-lg font-bold disabled:opacity-50">
           {loading ? '로그인 중...' : '입장하기'}
         </button>
-        <button type="button" onClick={() => { login('bypass-token', 1, 1, '1', '테스트매장'); navigate('/', { replace: true }); }} className="w-full p-2 text-sm text-gray-400 underline">
-          테스트 입장 (바이패스)
-        </button>
+        <div className="flex gap-2">
+          {[1, 2, 3].map((room) => (
+            <button key={room} type="button" onClick={() => {
+              login('bypass-token', 1, room, String(room), '테스트매장');
+              navigate('/', { replace: true });
+            }} className="flex-1 p-2 text-sm text-pink-500 border border-pink-200 rounded-xl hover:bg-pink-50">
+              Room {room}
+            </button>
+          ))}
+        </div>
       </form>
     </div>
   );

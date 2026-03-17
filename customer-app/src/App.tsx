@@ -5,7 +5,6 @@ import LoginPage from './pages/LoginPage';
 import MenuPage from './pages/MenuPage';
 import OrderPage from './pages/OrderPage';
 import SocialPage from './pages/SocialPage';
-import MergePage from './pages/MergePage';
 import GamePage from './pages/GamePage';
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
@@ -21,7 +20,6 @@ export default function App() {
         <Route index element={<MenuPage />} />
         <Route path="orders" element={<OrderPage />} />
         <Route path="social" element={<SocialPage />} />
-        <Route path="merge" element={<MergePage />} />
         <Route path="games" element={<GamePage />} />
       </Route>
     </Routes>
