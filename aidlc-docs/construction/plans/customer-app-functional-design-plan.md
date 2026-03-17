@@ -1,0 +1,9 @@
+# Functional Design Plan - Customer App
+
+## Steps
+- [x] 1. Unit 4 컨텍스트 분석 (US-01~18, 고객용 전체 UI)
+- [x] 2. 페이지/라우팅 구조 설계
+- [x] 3. 컴포넌트 계층 및 Props/State 설계
+- [x] 4. API 연동 포인트 매핑
+- [x] 5. 비즈니스 규칙 (프론트엔드 측)
+- [x] 6. 산출물 생성
