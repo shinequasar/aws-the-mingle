@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useCartStore } from '../stores/cartStore';
 import { useAuthStore } from '../stores/authStore';
-import api from '../services/api';
+import { mockOrders } from '../services/mock';
 import toast from 'react-hot-toast';
 import { MdShoppingCart, MdCheckCircle, MdDelete } from 'react-icons/md';
 
@@ -14,18 +14,16 @@ export default function CartDrawer({ isOpen, onClose }: { isOpen: boolean; onClo
 
   const handleOrder = async () => {
     if (!items.length) return;
-    try {
-      const { data } = await api.post(`/rooms/${roomId}/orders`, {
-        items: items.map((i) => ({ menuId: i.menu.id, menuName: i.menu.name, quantity: i.quantity, unitPrice: i.menu.price })),
-        totalAmount: total(),
-      });
-      setOrdered(data.data.id);
-      clear();
-      toast.success('주문 완료!');
-      setTimeout(() => { setOrdered(null); onClose(); }, 5000);
-    } catch {
-      toast.error('주문 실패. 다시 시도해주세요.');
-    }
+    const id = Math.floor(Math.random() * 9000) + 1000;
+    mockOrders.push({
+      id, roomId: roomId ?? 1, sessionId: 1, totalAmount: total(), status: 'PENDING',
+      createdAt: new Date().toISOString(),
+      items: items.map((i, idx) => ({ id: id * 10 + idx, menuName: i.menu.name, quantity: i.quantity, unitPrice: i.menu.price })),
+    });
+    setOrdered(id);
+    clear();
+    toast.success('주문 완료!');
+    setTimeout(() => { setOrdered(null); onClose(); }, 5000);
   };
 
   return (

@@ -3,7 +3,7 @@ import { useAuthStore } from '../stores/authStore';
 import { useSSE } from '../hooks/useSSE';
 import api from '../services/api';
 import toast from 'react-hot-toast';
-import type { Order } from '../types';
+import type { Room, Order } from '../types';
 
 interface RoomOrders { roomId: number; roomNumber: string; orders: Order[]; totalAmount: number; }
 
@@ -18,16 +18,31 @@ export default function DashboardPage() {
   const storeId = useAuthStore((s) => s.storeId);
   const [rooms, setRooms] = useState<RoomOrders[]>([]);
 
-  const fetchRooms = () => api.get(`/admin/rooms`, { params: { storeId } }).then((r) => setRooms(r.data.data)).catch(() => {});
-  useEffect(() => { fetchRooms(); }, [storeId]);
-  useSSE(`/admin/sse/orders?storeId=${storeId}`, () => { fetchRooms(); toast('새 주문!', { icon: '🔔' }); });
+  const fetchData = async () => {
+    try {
+      const [roomsRes, ordersRes] = await Promise.all([
+        api.get('/admin/rooms', { params: { storeId } }),
+        api.get('/admin/orders'),
+      ]);
+      const roomList: Room[] = roomsRes.data.data;
+      const orderList: Order[] = ordersRes.data.data;
+      const grouped: RoomOrders[] = roomList.map((r) => {
+        const ro = orderList.filter((o) => o.roomId === r.id);
+        return { roomId: r.id, roomNumber: String(r.roomNumber), orders: ro, totalAmount: ro.reduce((s, o) => s + o.totalAmount, 0) };
+      });
+      setRooms(grouped);
+    } catch {}
+  };
+
+  useEffect(() => { fetchData(); }, [storeId]);
+  useSSE(`/admin/sse/orders?storeId=${storeId}`, () => { fetchData(); toast('새 주문!', { icon: '🔔' }); });
 
   const changeStatus = async (orderId: number, current: string) => {
     const idx = statusFlow.indexOf(current);
     if (idx >= statusFlow.length - 1) return;
     try {
       await api.put(`/admin/orders/${orderId}/status`, { status: statusFlow[idx + 1] });
-      fetchRooms();
+      fetchData();
     } catch { toast.error('상태 변경 실패'); }
   };
 

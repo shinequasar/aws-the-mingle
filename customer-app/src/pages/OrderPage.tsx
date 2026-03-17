@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useAuthStore } from '../stores/authStore';
-import api from '../services/api';
+import { mockOrders } from '../services/mock';
 import type { Order } from '../types';
 
 const statusLabel: Record<string, { text: string; color: string }> = {
@@ -10,12 +9,11 @@ const statusLabel: Record<string, { text: string; color: string }> = {
 };
 
 export default function OrderPage() {
-  const roomId = useAuthStore((s) => s.roomId);
-  const [orders, setOrders] = useState<Order[]>([]);
+  const [orders, setOrders] = useState<Order[]>(mockOrders);
 
   useEffect(() => {
-    api.get(`/rooms/${roomId}/orders`).then((r) => setOrders(r.data.data));
-  }, [roomId]);
+    setOrders([...mockOrders]);
+  }, []);
 
   return (
     <div className="p-4 space-y-3">

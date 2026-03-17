@@ -24,7 +24,7 @@ export default function AppLayout() {
   return (
     <div className="flex flex-col h-screen bg-white">
       <header className="flex items-center justify-between px-4 py-3 bg-white border-b border-gray-100">
-        <div className="font-bold text-lg text-ink">💕 {storeName} <span className="text-gray-400 text-sm font-normal">Room {roomNumber}</span></div>
+        <div className="font-bold text-lg text-ink"><img src="https://em-content.zobj.net/source/microsoft-teams/363/two-hearts_1f495.png" alt="💕" className="inline w-6 h-6 mr-1" /> {storeName} <span className="text-gray-400 text-sm font-normal">Room {roomNumber}</span></div>
         <div className="flex items-center gap-3">
           <TimerWidget />
           <button data-testid="cart-open-button" onClick={() => setCartOpen(true)} className="text-2xl text-ink hover:text-pink-500 transition-colors"><MdShoppingCart /></button>

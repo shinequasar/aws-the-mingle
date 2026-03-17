@@ -36,10 +36,7 @@ const menus: Menu[] = [
   { id: 21, categoryId: 5, name: '막걸리', price: 8000, description: '전통 생막걸리 한 병', imageUrl: `${IMG}/makgeolli.jpg`, displayOrder: 7, storeId: 1 },
 ];
 
-const mockOrders: Order[] = [
-  { id: 1, roomId: 1, sessionId: 1, totalAmount: 12000, status: 'COMPLETED', createdAt: new Date().toISOString(), items: [{ id: 1, menuName: '핫도그 세트', quantity: 1, unitPrice: 5000 }, { id: 2, menuName: '만두 라면', quantity: 1, unitPrice: 7000 }] },
-  { id: 2, roomId: 1, sessionId: 1, totalAmount: 8500, status: 'PREPARING', createdAt: new Date().toISOString(), items: [{ id: 3, menuName: '토마토 파스타', quantity: 1, unitPrice: 8500 }] },
-];
+export const mockOrders: Order[] = [];
 
 const icebreakers: GameQuestion[] = [
   { id: 1, type: 'ICEBREAKER', category: 'light', content: '가장 최근에 웃었던 이유는?', optionA: '', optionB: '' },
